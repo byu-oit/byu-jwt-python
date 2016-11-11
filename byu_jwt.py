@@ -18,8 +18,10 @@ from __future__ import print_function
 import re
 import jwt
 import json
+import yaml
 import plac
 import requests
+from os.path import expanduser
 
 def get_wellknown_data():
     """
@@ -59,7 +61,23 @@ def format_PEM(public_key):
     postfix = "\n-----END CERTIFICATE-----";
     return prefix + public_key + postfix;
 
+def _get_test_jwt():
+    # curl -k -d "grant_type=client_credentials" -u "client_id:client_secret" https://api.byu.edu/token
+    # {"scope":"default","token_type":"bearer","expires_in":3600,"refresh_token":"refresh_token","access_token":"access_token"}
+    conf = yaml.load(open('{}/.byu/byu-jwt-python.yaml'.format(expanduser('~'))))
+    response = requests.post('https://api.byu.edu/token', auth=(conf['client_id'], conf['client_secret']), data={'grant_type': 'client_credentials'})
+    response.raise_for_status()
+    access_token = response.json()['access_token']
+    # curl -X GET --header "Accept: application/json" --header "Authorization: Bearer aaaaaaaaaaaaaaaaaaaaaaa" "https://api.byu.edu/echo/v1/echo/{+echo_string}"
+    response = requests.get('https://api.byu.edu/echo/v1/echo/testing', headers={'Authorization': 'Bearer ' + access_token, 'Accept': 'application/json'})
+    jwt = response.json()['Headers']['X-Jwt-Assertion'][0]
+    return jwt
+
 def is_valid(jwt_to_validate):
+    """
+    #>>> is_valid(_get_test_jwt())
+    #True
+    """
     try:
         decode(jwt_to_validate)
         return True
@@ -68,13 +86,12 @@ def is_valid(jwt_to_validate):
 
 def decode(jwt_to_decode):
     """
-    # TODO test by getting a JWT from the echo service
+    >>> decode(_get_test_jwt())
     """
     well_known = get_wellknown_data()
     jwks_data = get_jwks_data(well_known['jwks_uri'])
-    print(jwks_data)
     return jwt.decode(jwt_to_decode,
-                      format_PEM(jwks_data['keys'][0]['x5c']),
+                      format_PEM(jwks_data['keys'][0]['x5c'][0]),
                       verify=True,
                       issuer=well_known['issuer'], 
                       leeway=2)
