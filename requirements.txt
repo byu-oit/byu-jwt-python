@@ -2,3 +2,4 @@ pyjwt
 plac
 requests
 pyyaml
+pyOpenSSL

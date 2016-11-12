@@ -17,10 +17,13 @@
 from __future__ import print_function
 import re
 import jwt
+import sys
 import json
 import yaml
 import plac
+import base64
 import requests
+from OpenSSL import crypto 
 from os.path import expanduser
 
 def get_wellknown_data():
@@ -29,7 +32,7 @@ def get_wellknown_data():
     >>> isinstance(get_wellknown_data(), dict)
     True
     """
-    response = requests.get('https://api.byu.edu/.well-known/openid-configuration')
+    response = requests.get('https://api.byu.edu/.well-known/openid-configuration', headers={'User-Agent': 'BYU-JWT-Python-SDK/1.0 (Python {})'.format(sys.version.replace('\n', ''))})
     response.raise_for_status()
     return response.json()
 
@@ -90,11 +93,14 @@ def decode(jwt_to_decode):
     """
     well_known = get_wellknown_data()
     jwks_data = get_jwks_data(well_known['jwks_uri'])
+    der_file = crypto.load_certificate(crypto.FILETYPE_ASN1, base64.b64decode(jwks_data['keys'][0]['x5c'][0])) 
+    # TODO finish here
     return jwt.decode(jwt_to_decode,
                       format_PEM(jwks_data['keys'][0]['x5c'][0]),
                       verify=True,
                       issuer=well_known['issuer'], 
-                      leeway=2)
+                      leeway=2,
+                      algorithm=['RS256'])
 
 def test(verbose=False):
     import doctest
