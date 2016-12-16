@@ -78,8 +78,16 @@ def _get_test_jwt():
 
 def is_valid(jwt_to_validate):
     """
-    #>>> is_valid(_get_test_jwt())
-    #True
+    All of the encode and decode stuff here is for python2 and python3 compatibility
+    >>> test_jwt = _get_test_jwt()
+    >>> is_valid(test_jwt)
+    True
+    >>> header, body, signature = test_jwt.split('.')
+    >>> decoded_jwt = json.loads(base64.b64decode(str(body) + '===').decode('utf-8'))
+    >>> decoded_jwt['iss'] = 'http://fake.com'
+    >>> invalid_jwt = header + '.' + base64.b64encode(json.dumps(decoded_jwt).encode('utf-8')).decode('utf-8') + '.' + signature
+    >>> is_valid(invalid_jwt)
+    False
     """
     try:
         decode(jwt_to_validate)
@@ -89,14 +97,15 @@ def is_valid(jwt_to_validate):
 
 def decode(jwt_to_decode):
     """
-    >>> decode(_get_test_jwt())
+    >>> ans = decode(_get_test_jwt())
+    >>> ans is not None
+    True
     """
     well_known = get_wellknown_data()
     jwks_data = get_jwks_data(well_known['jwks_uri'])
     der_file = crypto.load_certificate(crypto.FILETYPE_ASN1, base64.b64decode(jwks_data['keys'][0]['x5c'][0])) 
-    # TODO finish here
     return jwt.decode(jwt_to_decode,
-                      format_PEM(jwks_data['keys'][0]['x5c'][0]),
+                      der_file.get_pubkey().to_cryptography_key(),
                       verify=True,
                       issuer=well_known['issuer'], 
                       leeway=2,
