@@ -9,6 +9,8 @@ client_secret: <your WSO2 application's Consumer Secret>
 ```
 
 ## API
+
+
 ### JWT Header Names
 
 BYU's API Manager creates an HTTP header that contains a signed [JWT](https://jwt.io/). The names of the designed BYU signed headers can be referenced here for lookup convenience.
@@ -37,4 +39,21 @@ Example
 ```
 import byu_jwt
 original_jwt_header = byu_jwt.BYU_JWT_HEADER_ORIGINAL
+```
+
+## Testing
+To run the integration tests do the following:
+
+First make sure you have python and python3 installed on your system, then install virtualenv in whatever way you install python modules (usually `$ pip install virtualenv`).
+
+```
+$ virtualenv venv
+$ source venv/bin/activate
+$ pip install -r requirements
+$ pip3 install -r requirements
+$ python byu_jwt.py True 
+# The 'True' makes the tests run in verbose mode.  
+# Leaving it off will run the tests silently and they will only print info if any tests fail.
+$ python3 byu_jwt.py True
+$ deactivate # to get out of the virtualenv
 ```
