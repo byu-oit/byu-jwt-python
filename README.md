@@ -21,8 +21,6 @@ Value is X-JWT-Assertion.
 
 Example
 
-The example uses the property to retrieve the header from the request.
-
 ```
 import byu_jwt
 current_jwt_header = byu_jwt.BYU_JWT_HEADER_CURRENT
@@ -36,9 +34,7 @@ Value is X-JWT-Assertion-Original.
 
 Example
 
-The example uses the property to retrieve the header from the request.
-
 ```
 import byu_jwt
-current_jwt_header = byu_jwt.BYU_JWT_HEADER_ORIGINAL
+original_jwt_header = byu_jwt.BYU_JWT_HEADER_ORIGINAL
 ```
