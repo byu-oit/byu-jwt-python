@@ -26,6 +26,9 @@ import requests
 from OpenSSL import crypto 
 from os.path import expanduser
 
+BYU_JWT_HEADER_CURRENT = 'X-JWT-Assertion'
+BYU_JWT_HEADER_ORIGINAL = 'X-JWT-Assertion-Original'
+
 def get_wellknown_data():
     """
     Returns the wellknown URL's JSON
