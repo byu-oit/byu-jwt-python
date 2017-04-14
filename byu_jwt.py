@@ -23,6 +23,7 @@ import yaml
 import fire
 import base64
 import requests
+import subprocess
 from OpenSSL import crypto 
 from os.path import expanduser
 
@@ -201,6 +202,26 @@ def decode(jwt_to_decode):
 def test(verbose=False):
     import doctest
     doctest.testmod(verbose=verbose)
+
+def _output(cmd):
+    """
+    >>> _output('echo "testing"')
+    'testing\\n'
+    """
+    return subprocess.check_output(cmd, shell=True)
+
+def _shell(cmd):
+    """
+    >>> _shell('echo ""')
+    Running \"echo \"\"\"...
+    """
+    print('Running "{}"...'.format(cmd))
+    subprocess.check_call(cmd, shell=True)
+
+def deploy():
+    _shell('python setup.py sdist')
+    _shell('twine upload dist/*')
+    _shell('python setup.py clean')
 
 if __name__ == "__main__":
     fire.Fire()
