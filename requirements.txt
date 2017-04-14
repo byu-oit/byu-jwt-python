@@ -1,5 +1,5 @@
 pyjwt
-plac
+fire
 requests
 pyyaml
 pyOpenSSL
