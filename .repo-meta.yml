@@ -14,8 +14,8 @@ ddd:
   ubiquitous_language_url: 
   context_map_url: 
 links:
-  system_documentation_url: https://github.com/byu-oit-appdev/byu-jwt-python
-  source_repo_url: https://github.com/byu-oit-appdev/byu-jwt-python
+  system_documentation_url: https://github.com/byu-oit/byu-jwt-python
+  source_repo_url: https://github.com/byu-oit/byu-jwt-python
   swagger_urls:
 microservice: False
 technologies_used:
@@ -23,7 +23,7 @@ technologies_used:
 stages:
   production:
     urls:
-      product_page: https://github.com/byu-oit-appdev/byu-jwt-python
+      product_page: https://github.com/byu-oit/byu-jwt-python
       physical_url: 
       virtual_url: 
     hosting_location: 
@@ -47,5 +47,5 @@ tags:
   data-sensitivity: public
   team: AD-Student Life Applications
   app: byu-jwt-python
-federation_json_url: https://raw.githubusercontent.com/byu-oit-appdev/byu-jwt-python/master/.repo-meta.yml
+federation_json_url: https://raw.githubusercontent.com/byu-oit/byu-jwt-python/master/.repo-meta.yml
 
