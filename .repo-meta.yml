@@ -18,7 +18,6 @@ software:
         context_map_url:
     links:
         system_documentation_url: https://github.com/byu-oit/byu-jwt-python
-        swagger_urls:
     microservice: false
     technologies_used:
       - Python
@@ -26,24 +25,11 @@ software:
         production:
             urls:
                 product_page: https://github.com/byu-oit/byu-jwt-python
-                physical_url:
-                virtual_url:
-            hosting_location:
-            aws_account:
+            hosting_location: Other
             relationships:
-                depends_on:
-                    db_read_write:
-                    db_read_only:
-                    software:
                 supports:
                     software:
                     service:
-                reverse_proxy:
-                runs_on:
-                    server_cluster:
-                    virtual_server:
-                    rack_server:
-                    blade_server:
     tags:
         data-sensitivity: public
         team: AD-Student Life Applications
