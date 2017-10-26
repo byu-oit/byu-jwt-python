@@ -1,0 +1,16 @@
+version: 1
+
+name: byu-jwt-python
+
+pipelines: 
+  prd:
+    phases:
+    - type: github
+      name: Source
+      owner: byu-oit
+      repo: byu-jwt-python
+      branch: master
+    - type: codebuild
+      name: Build
+      build_image: python:3.6
+# TODO add a step to push to pypi
