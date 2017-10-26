@@ -1,0 +1,19 @@
+version: 1
+
+name: backupcollibra
+
+pipelines: 
+  prd:
+    phases:
+    - type: github
+      name: Source
+      owner: byu-oit
+      repo: backupcollibra
+      branch: master
+    - type: codebuild
+      name: Build
+      build_image: aws/codebuild/nodejs:4.3.2
+    - type: handel
+      name: PrdDeploy
+      environments_to_deploy:
+      - prd
