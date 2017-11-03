@@ -2,7 +2,7 @@
 
 import sys
 from setuptools import setup, find_packages
-version = '1.1.0'
+version = '1.1.1'
 
 if sys.version_info == (2, 7,) or sys.version[0] == 3:
     sys.stderr.write("This version of byu_jwt requires Python 2.7 or 3.*\n")

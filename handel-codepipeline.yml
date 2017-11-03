@@ -13,4 +13,5 @@ pipelines:
     - type: codebuild
       name: Build
       build_image: python:3.6
-# TODO add a step to push to pypi
+    - type: pypi
+      name: PublishToPypi
