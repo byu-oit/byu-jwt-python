@@ -48,7 +48,6 @@ original_jwt_header = byu_jwt.BYU_JWT_HEADER_ORIGINAL
 ```
 
 ## Testing
-To run the integration tests do the following:
 
 You will need a file named ~/.byu/byu-jwt-python.yaml with the following contents. Get your info at https://api.byu.edu/store/site/pages/subscriptions.jag
 ```
