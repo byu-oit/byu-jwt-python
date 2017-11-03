@@ -4,12 +4,6 @@ A python JWT validator that does all the BYU specific stuff as well.
 # Installation
 `pip install byu_jwt`
 
-You will need a file named ~/.byu/byu-jwt-python.yaml with the following contents. Get your info at https://api.byu.edu/store/site/pages/subscriptions.jag
-```
-client_id: <your WSO2 application's Consumer Key>
-client_secret: <your WSO2 application's Consumer Secret>
-```
-
 ## API
 
 ### How to Validate a JWT
@@ -56,7 +50,13 @@ original_jwt_header = byu_jwt.BYU_JWT_HEADER_ORIGINAL
 ## Testing
 To run the integration tests do the following:
 
-First make sure you have python and python3 installed on your system, then install virtualenv in whatever way you install python modules (usually `$ pip install virtualenv`).
+You will need a file named ~/.byu/byu-jwt-python.yaml with the following contents. Get your info at https://api.byu.edu/store/site/pages/subscriptions.jag
+```
+client_id: <your WSO2 application's Consumer Key>
+client_secret: <your WSO2 application's Consumer Secret>
+```
+
+Make sure you have python and python3 installed on your system, then install virtualenv in whatever way you install python modules (usually `$ pip install virtualenv`).
 
 ```
 $ virtualenv venv
