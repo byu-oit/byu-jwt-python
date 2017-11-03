@@ -17,7 +17,7 @@ client_secret: <your WSO2 application's Consumer Secret>
 ```
 import byu_jwt
 try:
-    decode(jwt_to_validate)
+    byu_jwt.decode(jwt_to_validate)
     # valide JWT
 except Exception:
     # invalid JWT
