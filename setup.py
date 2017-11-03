@@ -24,5 +24,5 @@ setup(name='byu_jwt',
       data_files=[('', ['README.md', 'LICENSE'])],
       test_suite="byu_jwt.test",
       license="Apache 2.0",
-      install_requires=filter(lambda item: item, open('requirements.txt').read().split('\n')),
+      install_requires=list(filter(lambda item: item, open('requirements.txt').read().split('\n'))),
       zip_safe=True)
