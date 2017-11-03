@@ -2,7 +2,7 @@
 
 import sys
 from setuptools import setup, find_packages
-version = '1.1.1'
+version = '1.1.2'
 
 if sys.version_info == (2, 7,) or sys.version[0] == 3:
     sys.stderr.write("This version of byu_jwt requires Python 2.7 or 3.*\n")
@@ -20,7 +20,7 @@ setup(name='byu_jwt',
       author='BYU OIT Application Development',
       author_email='paul.eden@byu.edu',
       url='https://github.com/byu-oit-appdev/byu-jwt-python',
-      packages=find_packages(),
+      py_modules=['byu_jwt'],
       data_files=[('', ['README.md', 'LICENSE'])],
       test_suite="byu_jwt.test",
       license="Apache 2.0",
