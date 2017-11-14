@@ -1,8 +1,8 @@
-$schemaver: 2.0
+$schemaver: '2.0'
 repo_url: https://github.com/byu-oit/byu-jwt-python
 software:
   - aliases:
-    assignment_group: 'gro:AD-Student Life Applications'
+    assignment_group: gro:AD-Student Life Applications
     ddd:
       business_domain:
       context_map_url:
@@ -15,8 +15,8 @@ software:
     microservice: false
     name: byu-jwt-python
     notes:
-    short_description: 'A python JWT validator that does all the BYU specific stuff
-      as well.'
+    short_description: A python JWT validator that does all the BYU specific stuff
+      as well.
     stages:
       production:
         hosting_location: Other
@@ -29,10 +29,10 @@ software:
     tags:
       app: byu-jwt-python
       data-sensitivity: public
-      team: 'AD-Student Life Applications'
+      team: AD-Student Life Applications
     technologies_used:
       - Python
-      - 'AWS CodeBuild'
+      - AWS CodeBuild
       - Handel-Codepipeline
-      - 'AWS CodePipeline'
+      - AWS CodePipeline
     type: Library
