@@ -1,4 +1,4 @@
-$schemaver: '2.0'
+$schemaver: 2.1
 repo_url: https://github.com/byu-oit/byu-jwt-python
 software:
   - aliases:
@@ -26,13 +26,10 @@ software:
             software:
         urls:
           product_page: https://github.com/byu-oit/byu-jwt-python
-    tags:
-      app: byu-jwt-python
-      data-sensitivity: public
-      team: AD-Student Life Applications
     technologies_used:
       - Python
       - AWS CodeBuild
       - Handel-Codepipeline
       - AWS CodePipeline
     type: Library
+    data_sensitivity: public
