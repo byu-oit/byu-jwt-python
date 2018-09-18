@@ -1,3 +1,0 @@
-add a CI/CD pipeline
-    in the CI part run the tests in both python2 and 3
-    in the CD part we'll publish to pypi.python.org if the tests passed
