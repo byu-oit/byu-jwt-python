@@ -74,6 +74,7 @@ class BYU_JWT(object):
         True
         """
         url = '{}/.well-known/openid-configuration'.format(self.base_url)
+        url = 'https://ma5d57gib9.execute-api.us-west-2.amazonaws.com/prd/openid-configuration'
         response = requests.get(url, headers={
                                 'User-Agent': 'BYU-JWT-Python-SDK/1.0 (Python {})'.format(sys.version.replace('\n', ''))})
         response.raise_for_status()
@@ -93,11 +94,14 @@ class BYU_JWT(object):
         >>> 'x5c' in jwks_data['keys'][0]
         True
         """
+        jwks_uri = 'https://ma5d57gib9.execute-api.us-west-2.amazonaws.com/prd/byucerts'
+        print(jwks_uri)
         response = requests.get(jwks_uri)
+        print(response.text)
         response.raise_for_status()
         cache_control = response.headers.get(
             'Cache-Control', 'public max-age=3600').split('=')[1]
-        ttl = datetime.now() + timedelta(seconds=cache_control)
+        ttl = datetime.now() + timedelta(seconds=int(cache_control))
         return response.json(), ttl.timestamp()
 
     def is_valid(self, jwt_to_validate):
@@ -125,7 +129,7 @@ class BYU_JWT(object):
         >>> ans is not None
         True
         """
-        x5t = self._extract_x5t_from_jwt(jwt_to_decode)
+        x5t = self.extract_x5t_from_jwt(jwt_to_decode)
         pubkeys = self.get_signing_cert()
         decoded_jwt = jwt.decode(jwt_to_decode,
                                  pubkeys[x5t],
