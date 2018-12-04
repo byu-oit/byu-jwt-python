@@ -74,7 +74,7 @@ class BYU_JWT(object):
         True
         """
         url = '{}/.well-known/openid-configuration'.format(self.base_url)
-        url = 'https://ma5d57gib9.execute-api.us-west-2.amazonaws.com/prd/openid-configuration'
+        # url = 'https://ma5d57gib9.execute-api.us-west-2.amazonaws.com/prd/openid-configuration'
         response = requests.get(url, headers={
                                 'User-Agent': 'BYU-JWT-Python-SDK/1.0 (Python {})'.format(sys.version.replace('\n', ''))})
         response.raise_for_status()
@@ -94,7 +94,7 @@ class BYU_JWT(object):
         >>> 'x5c' in jwks_data['keys'][0]
         True
         """
-        jwks_uri = 'https://ma5d57gib9.execute-api.us-west-2.amazonaws.com/prd/byucerts'
+        # jwks_uri = 'https://ma5d57gib9.execute-api.us-west-2.amazonaws.com/prd/byucerts'
         print(jwks_uri)
         response = requests.get(jwks_uri)
         print(response.text)
