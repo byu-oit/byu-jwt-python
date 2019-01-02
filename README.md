@@ -1,17 +1,27 @@
 # byu-jwt-python
-A python JWT validator that does all the BYU specific stuff as well.
+A python JWT validator that does all the BYU specific stuff as well as handle caching well-known and cert fetching
 
 # Installation
 `pip install byu_jwt`
 
 ## API
 
-### How to Validate a JWT
+Instantiate the class and reuse the object to utilize caching
 
-```
+```python
 import byu_jwt
+byujwt = byu_jwt.JWT()
+```
+
+### Check only if JWT is valid
+```python
+assert byujwt.is_valid(jwt_to_validate)
+```
+
+### Decode JWT and Check validity
+```python
 try:
-    byu_jwt.decode(jwt_to_validate)
+    jwt = byujwt.decode(jwt_to_validate)
     # valid JWT
 except Exception:
     # invalid JWT
@@ -29,9 +39,8 @@ Value is X-JWT-Assertion.
 
 Example
 
-```
-import byu_jwt
-current_jwt_header = byu_jwt.BYU_JWT_HEADER_CURRENT
+```python
+current_jwt_header = byujwt.BYU_JWT_HEADER_CURRENT
 ```
 
 ### BYU_JWT_HEADER_ORIGINAL
@@ -42,29 +51,79 @@ Value is X-JWT-Assertion-Original.
 
 Example
 
+```python
+original_jwt_header = byujwt.BYU_JWT_HEADER_ORIGINAL
 ```
+
+### Example Python Lambda function that makes use of caching
+```python
 import byu_jwt
-original_jwt_header = byu_jwt.BYU_JWT_HEADER_ORIGINAL
-```
 
-## Testing
+byujwt = byu_jwt.JWT()
 
-You will need a file named ~/.byu/byu-jwt-python.yaml with the following contents. Get your info at https://api.byu.edu/store/site/pages/subscriptions.jag
+def handler(event, context):
+    jwt_to_decode = event['headers']['X-JWT-Assertion']
+    try:
+        jwt = byujwt.decode(jwt_to_decode)
+    except Exception:
+        print("Error validating and decoding JWT")
 ```
-client_id: <your WSO2 application's Consumer Key>
-client_secret: <your WSO2 application's Consumer Secret>
-```
+**NOTE:** The important part is putting the line `byujwt = byu_jwt.JWT()` at a global level. This allows the object to be reused on subsequent lambda invocations for as long as the lambda is warm. This allows the caching of the well-known data and respecting the cache-control headers on the certificates only refetching those when cache-control has timed out
 
-Make sure you have python and python3 installed on your system, then install virtualenv in whatever way you install python modules (usually `$ pip install virtualenv`).
 
-```
-$ virtualenv venv
-$ source venv/bin/activate
-$ pip install -r requirements
-$ pip3 install -r requirements
-$ python byu_jwt.py True 
-# The 'True' makes the tests run in verbose mode.  
-# Leaving it off will run the tests silently and they will only print info if any tests fail.
-$ python3 byu_jwt.py True
-$ deactivate # to get out of the virtualenv
+### Example Decoded JWT Structure
+```json
+{
+  "iss": "https://api.byu.edu",
+  "exp": 1545425710,
+  "byu": {
+    "client": {
+      "byuId": "",
+      "claimSource": "",
+      "netId": "",
+      "personId": "",
+      "preferredFirstName": "",
+      "prefix": "",
+      "restOfName": "",
+      "sortName": "",
+      "subscriberNetId": "",
+      "suffix": "",
+      "surname": "",
+      "surnamePosition": ""
+    },
+    "resourceOwner": {
+      "byuId": "",
+      "netId": "",
+      "personId": "",
+      "preferredFirstName": "",
+      "prefix": "",
+      "restOfName": "",
+      "sortName": "",
+      "suffix": "",
+      "surname": "",
+      "surnamePosition": ""
+    },
+    "webresCheck": {
+      "byuId": "",
+      "netId": "",
+      "personId": ""
+    }
+  },
+  "wso2": {
+    "apiContext": "",
+    "application": {
+      "id": "",
+      "name": "",
+      "tier": ""
+    },
+    "clientId": "",
+    "endUser": "",
+    "endUserTenantId": "",
+    "keyType": "",
+    "subscriber": "",
+    "tier": "",
+    "userType": "",
+    "version": ""
+  }
+}
 ```
