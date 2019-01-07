@@ -8,8 +8,7 @@ env:
 phases:
   install:
     commands:
-      - pip install certifi
-      - curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+      - pip install poetry
       - poetry install
   pre_build:
     commands:
