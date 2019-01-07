@@ -1,10 +1,9 @@
 version: 0.2
 
-# TODO: figure out dynamic prefix
 env:
   parameter-store:
-    PYPI_User: PYPI_USER
-    PYPI_Passwd: PYPI_PASS
+    PYPI_USER: byu-jwt-python.prd.pypiuser
+    PYPI_PASS: byu-jwt-python.prd.pypipass
 
 phases:
   install:
@@ -17,7 +16,8 @@ phases:
   build:
     commands:
       - poetry build
-      - poetry publish -u $PYPI_USER -p PYPI_PASS
+      - poetry publish -u $PYPI_USER -p $PYPI_PASS
 artifacts:
   files:
     - ./**/*
+  
