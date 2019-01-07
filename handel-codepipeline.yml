@@ -13,5 +13,3 @@ pipelines:
     - type: codebuild
       name: Build
       build_image: aws/codebuild/python:3.7.1
-    - type: pypi
-      name: PublishToPypi
