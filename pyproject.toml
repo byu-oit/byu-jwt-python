@@ -9,7 +9,7 @@ homepage = "https://github.com/byu-oit/byu-jwt-python"
 repository = "https://github.com/byu-oit/byu-jwt-python"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.4"
 requests = "^2.21"
 pyjwt = "^1.7"
 cryptography = "^2.4"
