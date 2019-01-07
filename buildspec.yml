@@ -2,8 +2,8 @@ version: 0.2
 
 env:
   parameter-store:
-    PYPI_USER: byu-jwt-python.prd.pypiuser
-    PYPI_PASS: byu-jwt-python.prd.pypipass
+    PYPI_USER: byu-jwt-python.pypiuser
+    PYPI_PASS: byu-jwt-python.pypipass
 
 phases:
   install:
@@ -17,7 +17,7 @@ phases:
     commands:
       - poetry build
       - echo $PYPI_USER $PYPI_PASS
-      # - poetry publish -u $PYPI_USER -p $PYPI_PASS
+      - poetry publish -u $PYPI_USER -p $PYPI_PASS
 artifacts:
   files:
     - ./**/*
