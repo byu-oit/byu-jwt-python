@@ -9,7 +9,7 @@ pipelines:
       name: Source
       owner: byu-oit
       repo: byu-jwt-python
-      branch: master
+      branch: v2
     - type: codebuild
       name: Build
       build_image: aws/codebuild/python:3.7.1

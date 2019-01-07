@@ -16,6 +16,7 @@ phases:
   build:
     commands:
       - poetry build
+      - echo $PYPI_USER $PYPI_PASS
       # - poetry publish -u $PYPI_USER -p $PYPI_PASS
 artifacts:
   files:
