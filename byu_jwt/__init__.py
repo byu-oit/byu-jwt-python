@@ -1,4 +1,4 @@
-# Copyright 2016 Brigham Young University
+# Copyright 2019 Brigham Young University
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,25 +11,32 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-from __future__ import print_function
 import json
+import sys
 import time
 from datetime import datetime, timedelta
+
 import jwt
-import sys
 import requests
 
+from .exceptions import JWTHandlerError, JWTVerifyError
 
-class JWT(object):
+JWT_HEADER = 'X-JWT-Assertion'
+BYU_JWT_HEADER_ORIGINAL = 'X-JWT-Assertion-Original'
+
+
+def extract_x5t_from_jwt(_jwt):
+    return jwt.get_unverified_header(_jwt)['x5t']
+
+
+class JWT_Handler(object):
     """BYU_JWT Wraps the process of verifing the BYU JWT"""
-    BYU_JWT_HEADER_CURRENT = 'X-JWT-Assertion'  # TODO Not used probably remove
-    BYU_JWT_HEADER_ORIGINAL = 'X-JWT-Assertion-Original'  # TODO Not used probably remove
-    base_url = ""
-    jwks_data = {'pubkeys': {}, 'issuer': {}, 'ttl': 0}
 
     def __init__(self, base_url="https://api.byu.edu"):
         self.base_url = base_url
+        self.jwks_data = {'pubkeys': {}, 'issuer': {}, 'ttl': 0}
+        self.request_headers = {
+            'User-Agent': 'BYU-JWT-Python-SDK/2.0 (Python {})'.format(sys.version.replace('\n', ''))}
 
     def get_signing_cert(self):
         """
@@ -51,24 +58,25 @@ class JWT(object):
             key_set[thumbprint] = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(key))
         return key_set
 
-    @staticmethod
-    def extract_x5t_from_jwt(_jwt):
-        return jwt.get_unverified_header(_jwt)['x5t']
-
     def _get_wellknown_data(self):
         url = '{}/.well-known/openid-configuration'.format(self.base_url)
-        response = requests.get(url, headers={
-                                'User-Agent': 'BYU-JWT-Python-SDK/1.0 (Python {})'.format(sys.version.replace('\n', ''))})
-        response.raise_for_status()
-        return response.json()
+        try:
+            response = requests.get(url, headers=self.request_headers)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            raise JWTHandlerError("Error getting .well-known data") from e
 
     def _get_jwks_data(self, jwks_uri):
-        response = requests.get(jwks_uri)
-        response.raise_for_status()
-        cache_control = response.headers.get(
-            'Cache-Control', 'public max-age=3600').split('=')[1]
-        ttl = datetime.now() + timedelta(seconds=int(cache_control))
-        return response.json(), int(ttl.timestamp())
+        try:
+            response = requests.get(jwks_uri, headers=self.request_headers)
+            response.raise_for_status()
+            cache_control = response.headers.get(
+                'Cache-Control', 'public max-age=3600').split('=')[1]
+            ttl = datetime.now() + timedelta(seconds=int(cache_control))
+            return response.json(), int(ttl.timestamp())
+        except requests.exceptions.RequestException as e:
+            raise JWTHandlerError("Error getting jwks data") from e
 
     def is_valid(self, jwt_to_validate):
         try:
@@ -78,16 +86,19 @@ class JWT(object):
             return False
 
     def decode(self, jwt_to_decode, verify=True):
-        x5t = self.extract_x5t_from_jwt(jwt_to_decode)
-        pubkeys = self.get_signing_cert()
-        decoded_jwt = jwt.decode(jwt_to_decode,
-                                 pubkeys[x5t],
-                                 verify=verify,
-                                 issuer=self.jwks_data['issuer'],
-                                 leeway=2,
-                                 algorithms=['RS256'])
-        decoded_jwt = self.add_byu_output_structure(decoded_jwt)
-        return decoded_jwt
+        try:
+            x5t = extract_x5t_from_jwt(jwt_to_decode)
+            pubkeys = self.get_signing_cert()
+            decoded_jwt = jwt.decode(jwt_to_decode,
+                                     pubkeys[x5t],
+                                     verify=verify,
+                                     issuer=self.jwks_data['issuer'],
+                                     leeway=2,
+                                     algorithms=['RS256'])
+            decoded_jwt = self.add_byu_output_structure(decoded_jwt)
+            return decoded_jwt
+        except jwt.exceptions.PyJWTError as e:
+            raise JWTVerifyError("Invalid JWT") from e
 
     def add_byu_output_structure(self, decoded_jwt):
         decoded_jwt['byu'] = {
@@ -134,16 +145,5 @@ class JWT(object):
                 'suffix': decoded_jwt.pop('http://byu.edu/claims/resourceowner_suffix'),
                 'surname': decoded_jwt.pop('http://byu.edu/claims/resourceowner_surname'),
                 'surnamePosition': decoded_jwt.pop('http://byu.edu/claims/resourceowner_surname_position'),
-            }
-            decoded_jwt['byu']['webresCheck'] = {
-                'byuId': decoded_jwt['byu']['resourceOwner']['byuId'],
-                'netId': decoded_jwt['byu']['resourceOwner']['netId'],
-                'personId': decoded_jwt['byu']['resourceOwner']['personId'],
-            }
-        else:
-            decoded_jwt['byu']['webresCheck'] = {
-                'byuId': decoded_jwt['byu']['client']['byuId'],
-                'netId': decoded_jwt['byu']['client']['netId'],
-                'personId': decoded_jwt['byu']['client']['personId']
             }
         return decoded_jwt

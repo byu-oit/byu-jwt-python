@@ -6,11 +6,14 @@ A python JWT validator that does all the BYU specific stuff as well as handle ca
 
 ## API
 
-Instantiate the class and reuse the object to utilize caching
+---
+**Note: It is important to declare the handler at a global level. This allows the caching of the well-known data as well as using the cache-control headers on the certificates only refetching those when cache-control has timed out. Reinitializing the class object will negate any benefit of the caching**
 
+---
+Instantiate the class and reuse the object to utilize caching:
 ```python
 import byu_jwt
-byujwt = byu_jwt.JWT()
+byujwt = byu_jwt.JWT_Handler()
 ```
 
 ### Check only if JWT is valid
@@ -22,9 +25,11 @@ assert byujwt.is_valid(jwt_to_validate)
 ```python
 try:
     jwt = byujwt.decode(jwt_to_validate)
-    # valid JWT
-except Exception:
-    # invalid JWT
+    return f"Hello, {jwt['preferredFirstName']}"
+except byu_jwt.exceptions.JWTVerifyError as ex_info:
+    return "Invalid JWT"
+except byu_jwt.exceptions.JWTHandlerError as ex_info:
+    return "Error attempting to verify the jwt"
 ```
 
 ### JWT Header Names
@@ -40,7 +45,7 @@ Value is X-JWT-Assertion.
 Example
 
 ```python
-current_jwt_header = byujwt.BYU_JWT_HEADER_CURRENT
+current_jwt_header = byu_jwt.JWT_HEADER
 ```
 
 ### BYU_JWT_HEADER_ORIGINAL
@@ -52,7 +57,7 @@ Value is X-JWT-Assertion-Original.
 Example
 
 ```python
-original_jwt_header = byujwt.BYU_JWT_HEADER_ORIGINAL
+original_jwt_header = byu_jwt.JWT_HEADER_ORIGINAL
 ```
 
 ### Example Python Lambda function that makes use of caching
@@ -62,13 +67,15 @@ import byu_jwt
 byujwt = byu_jwt.JWT()
 
 def handler(event, context):
-    jwt_to_decode = event['headers']['X-JWT-Assertion']
+    jwt_to_decode = event['headers'][byu_jwt.JWT_HEADER]
     try:
-        jwt = byujwt.decode(jwt_to_decode)
-    except Exception:
-        print("Error validating and decoding JWT")
+        jwt = byujwt.decode(jwt_to_validate)
+        return {'statusCode': 200, 'body': f'Hello, {jwt["preferredFirstName"]}'}
+    except byu_jwt.exceptions.JWTVerifyError as ex_info:
+        return {'statusCode': 403, 'body': "Invalid JWT"}
+    except byu_jwt.exceptions.JWTHandlerError as ex_info:
+        return {'statusCode': 500, 'body': "Error attempting to verify the jwt"}
 ```
-**NOTE:** The important part is putting the line `byujwt = byu_jwt.JWT()` at a global level. This allows the object to be reused on subsequent lambda invocations for as long as the lambda is warm. This allows the caching of the well-known data and respecting the cache-control headers on the certificates only refetching those when cache-control has timed out
 
 
 ### Example Decoded JWT Structure
