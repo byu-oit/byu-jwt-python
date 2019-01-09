@@ -109,11 +109,6 @@ def handler(event, context):
       "suffix": "",
       "surname": "",
       "surnamePosition": ""
-    },
-    "webresCheck": {
-      "byuId": "",
-      "netId": "",
-      "personId": ""
     }
   },
   "wso2": {
