@@ -7,7 +7,7 @@ A python JWT validator that does all the BYU specific stuff as well as handle ca
 ## API
 
 ---
-**Note: It is important to declare the handler at a global level. This allows the caching of the well-known data as well as using the cache-control headers on the certificates only refetching those when cache-control has timed out. Reinitializing the class object will negate any benefit of the caching**
+**Note: It is important to declare the handler at a global level. This allows the caching of the well-known data as well as using the cache-control headers on the certificates only re-fetching those when cache-control has timed out. Reinitializing the class object will negate any benefit of the caching**
 
 ---
 Instantiate the class and reuse the object to utilize caching:
@@ -64,7 +64,7 @@ original_jwt_header = byu_jwt.JWT_HEADER_ORIGINAL
 ```python
 import byu_jwt
 
-byujwt = byu_jwt.JWT()
+byujwt = byu_jwt.JWT_Handler()
 
 def handler(event, context):
     jwt_to_decode = event['headers'][byu_jwt.JWT_HEADER]
