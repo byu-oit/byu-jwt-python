@@ -1,20 +1,35 @@
 # byu-jwt-python
-A python JWT validator that does all the BYU specific stuff as well.
+A python JWT validator that does all the BYU specific stuff as well as handle caching well-known and cert fetching
 
 # Installation
 `pip install byu_jwt`
 
 ## API
 
-### How to Validate a JWT
+---
+**Note: It is important to declare the handler at a global level. This allows the caching of the well-known data as well as using the cache-control headers on the certificates only re-fetching those when cache-control has timed out. Reinitializing the class object will negate any benefit of the caching**
 
-```
+---
+Instantiate the class and reuse the object to utilize caching:
+```python
 import byu_jwt
+byujwt = byu_jwt.JWT_Handler()
+```
+
+### Check only if JWT is valid
+```python
+assert byujwt.is_valid(jwt_to_validate)
+```
+
+### Decode JWT and Check validity
+```python
 try:
-    byu_jwt.decode(jwt_to_validate)
-    # valid JWT
-except Exception:
-    # invalid JWT
+    jwt = byujwt.decode(jwt_to_validate)
+    return f"Hello, {jwt['preferredFirstName']}"
+except byu_jwt.exceptions.JWTVerifyError as ex_info:
+    return "Invalid JWT"
+except byu_jwt.exceptions.JWTHandlerError as ex_info:
+    return "Error attempting to verify the jwt"
 ```
 
 ### JWT Header Names
@@ -29,9 +44,8 @@ Value is X-JWT-Assertion.
 
 Example
 
-```
-import byu_jwt
-current_jwt_header = byu_jwt.BYU_JWT_HEADER_CURRENT
+```python
+current_jwt_header = byu_jwt.JWT_HEADER
 ```
 
 ### BYU_JWT_HEADER_ORIGINAL
@@ -42,29 +56,76 @@ Value is X-JWT-Assertion-Original.
 
 Example
 
+```python
+original_jwt_header = byu_jwt.JWT_HEADER_ORIGINAL
 ```
+
+### Example Python Lambda function that makes use of caching
+```python
 import byu_jwt
-original_jwt_header = byu_jwt.BYU_JWT_HEADER_ORIGINAL
+
+byujwt = byu_jwt.JWT_Handler()
+
+def handler(event, context):
+    jwt_to_decode = event['headers'][byu_jwt.JWT_HEADER]
+    try:
+        jwt = byujwt.decode(jwt_to_validate)
+        return {'statusCode': 200, 'body': f'Hello, {jwt["preferredFirstName"]}'}
+    except byu_jwt.exceptions.JWTVerifyError as ex_info:
+        return {'statusCode': 403, 'body': "Invalid JWT"}
+    except byu_jwt.exceptions.JWTHandlerError as ex_info:
+        return {'statusCode': 500, 'body': "Error attempting to verify the jwt"}
 ```
 
-## Testing
 
-You will need a file named ~/.byu/byu-jwt-python.yaml with the following contents. Get your info at https://api.byu.edu/store/site/pages/subscriptions.jag
-```
-client_id: <your WSO2 application's Consumer Key>
-client_secret: <your WSO2 application's Consumer Secret>
-```
-
-Make sure you have python and python3 installed on your system, then install virtualenv in whatever way you install python modules (usually `$ pip install virtualenv`).
-
-```
-$ virtualenv venv
-$ source venv/bin/activate
-$ pip install -r requirements
-$ pip3 install -r requirements
-$ python byu_jwt.py True 
-# The 'True' makes the tests run in verbose mode.  
-# Leaving it off will run the tests silently and they will only print info if any tests fail.
-$ python3 byu_jwt.py True
-$ deactivate # to get out of the virtualenv
+### Example Decoded JWT Structure
+```json
+{
+  "iss": "https://api.byu.edu",
+  "exp": 1545425710,
+  "byu": {
+    "client": {
+      "byuId": "",
+      "claimSource": "",
+      "netId": "",
+      "personId": "",
+      "preferredFirstName": "",
+      "prefix": "",
+      "restOfName": "",
+      "sortName": "",
+      "subscriberNetId": "",
+      "suffix": "",
+      "surname": "",
+      "surnamePosition": ""
+    },
+    "resourceOwner": {
+      "byuId": "",
+      "netId": "",
+      "personId": "",
+      "preferredFirstName": "",
+      "prefix": "",
+      "restOfName": "",
+      "sortName": "",
+      "suffix": "",
+      "surname": "",
+      "surnamePosition": ""
+    }
+  },
+  "wso2": {
+    "apiContext": "",
+    "application": {
+      "id": "",
+      "name": "",
+      "tier": ""
+    },
+    "clientId": "",
+    "endUser": "",
+    "endUserTenantId": "",
+    "keyType": "",
+    "subscriber": "",
+    "tier": "",
+    "userType": "",
+    "version": ""
+  }
+}
 ```

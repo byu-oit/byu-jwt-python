@@ -1,6 +1,0 @@
-pyjwt
-fire
-twine
-requests
-pyyaml
-pyOpenSSL
