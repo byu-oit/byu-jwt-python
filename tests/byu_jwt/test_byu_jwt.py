@@ -4,8 +4,14 @@ import byu_jwt
 import requests
 import pytest
 import jwt
+from datetime import datetime, timedelta
 
-from .ref import JWKS, JWT, X5T
+from .ref import JWKS, X5T, test_valid_JWT, test_JWKS, test_expired_JWT, test_invalid_sig_JWT
+
+
+def mock_get_jwks_data(jwks_uri):
+    expires = datetime.now() + timedelta(seconds=3600)
+    return test_JWKS, int(expires.timestamp())
 
 
 def test_header():
@@ -29,7 +35,7 @@ def test_extract_public_keys():
 
 def test_extract_x5t_from_JWT_Handler():
     """extract an x5t header from JWT"""
-    assert X5T == byu_jwt.extract_x5t_from_jwt(JWT)
+    assert X5T == byu_jwt.extract_x5t_from_jwt(test_valid_JWT)
 
 
 def test_get_wellknown_data():
@@ -48,17 +54,36 @@ def test_get_jwks_data():
     assert ttl
 
 
-def test_is_valid():
-    """check that is_valid returns False for expired JWT"""
-    byujwt = byu_jwt.JWT_Handler()
-    assert not byujwt.is_valid(JWT)
-
-
-def test_decode():
+def test_decode_valid(monkeypatch):
     """verify that decode decodes the jwt"""
     byujwt = byu_jwt.JWT_Handler()
-    decoded_jwt = byujwt.decode(JWT, verify=False)
+    monkeypatch.setattr(byujwt, "_get_jwks_data", mock_get_jwks_data)
+    byujwt.jwks_data['ttl'] = 0
+    assert byujwt.is_valid(test_valid_JWT) is True
+    decoded_jwt = byujwt.decode(test_valid_JWT)
     assert decoded_jwt
+
+
+def test_decode_expired(monkeypatch):
+    """verify that decode decodes the jwt"""
+    byujwt = byu_jwt.JWT_Handler()
+    monkeypatch.setattr(byujwt, "_get_jwks_data", mock_get_jwks_data)
+    byujwt.jwks_data['ttl'] = 0
+    assert byujwt.is_valid(test_expired_JWT) is False
+    with pytest.raises(byu_jwt.exceptions.JWTVerifyError):
+        decoded_jwt = byujwt.decode(test_expired_JWT)
+        assert decoded_jwt
+
+
+def test_decode_invalid(monkeypatch):
+    """verify that decode decodes the jwt"""
+    byujwt = byu_jwt.JWT_Handler()
+    monkeypatch.setattr(byujwt, "_get_jwks_data", mock_get_jwks_data)
+    byujwt.jwks_data['ttl'] = 0
+    assert byujwt.is_valid(test_invalid_sig_JWT) is False
+    with pytest.raises(byu_jwt.exceptions.JWTVerifyError):
+        decoded_jwt = byujwt.decode(test_invalid_sig_JWT)
+        assert decoded_jwt
 
 
 @patch('byu_jwt.requests.get')
