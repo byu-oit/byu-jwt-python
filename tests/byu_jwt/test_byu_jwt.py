@@ -6,7 +6,7 @@ import pytest
 import jwt
 from datetime import datetime, timedelta
 
-from .ref import JWKS, X5T, test_valid_JWT, test_JWKS, test_expired_JWT, test_invalid_sig_JWT
+from .ref import JWKS, X5T, test_valid_JWT, test_JWKS, test_expired_JWT, test_invalid_sig_JWT, test_unknown_signer_JWT
 
 
 def mock_get_jwks_data(jwks_uri):
@@ -58,7 +58,6 @@ def test_decode_valid(monkeypatch):
     """verify that decode decodes the jwt"""
     byujwt = byu_jwt.JWT_Handler()
     monkeypatch.setattr(byujwt, "_get_jwks_data", mock_get_jwks_data)
-    byujwt.jwks_data['ttl'] = 0
     assert byujwt.is_valid(test_valid_JWT) is True
     decoded_jwt = byujwt.decode(test_valid_JWT)
     assert decoded_jwt
@@ -68,7 +67,6 @@ def test_decode_expired(monkeypatch):
     """verify that decode decodes the jwt"""
     byujwt = byu_jwt.JWT_Handler()
     monkeypatch.setattr(byujwt, "_get_jwks_data", mock_get_jwks_data)
-    byujwt.jwks_data['ttl'] = 0
     assert byujwt.is_valid(test_expired_JWT) is False
     with pytest.raises(byu_jwt.exceptions.JWTVerifyError):
         decoded_jwt = byujwt.decode(test_expired_JWT)
@@ -79,10 +77,19 @@ def test_decode_invalid(monkeypatch):
     """verify that decode decodes the jwt"""
     byujwt = byu_jwt.JWT_Handler()
     monkeypatch.setattr(byujwt, "_get_jwks_data", mock_get_jwks_data)
-    byujwt.jwks_data['ttl'] = 0
     assert byujwt.is_valid(test_invalid_sig_JWT) is False
     with pytest.raises(byu_jwt.exceptions.JWTVerifyError):
         decoded_jwt = byujwt.decode(test_invalid_sig_JWT)
+        assert decoded_jwt
+
+
+def test_decode_unknown_signer(monkeypatch):
+    """verify that decode decodes the jwt"""
+    byujwt = byu_jwt.JWT_Handler()
+    monkeypatch.setattr(byujwt, "_get_jwks_data", mock_get_jwks_data)
+    assert byujwt.is_valid(test_unknown_signer_JWT) is False
+    with pytest.raises(byu_jwt.exceptions.JWTVerifyError):
+        decoded_jwt = byujwt.decode(test_unknown_signer_JWT)
         assert decoded_jwt
 
 
