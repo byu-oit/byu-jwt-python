@@ -89,6 +89,8 @@ class JWT_Handler(object):
         try:
             x5t = extract_x5t_from_jwt(jwt_to_decode)
             pubkeys = self.get_signing_cert()
+            if x5t not in pubkeys:
+                raise JWTVerifyError("Unknown Signer Key")
             decoded_jwt = jwt.decode(jwt_to_decode,
                                      pubkeys[x5t],
                                      verify=verify,
