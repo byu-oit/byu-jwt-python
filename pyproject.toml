@@ -2,7 +2,7 @@
 name = "byu_jwt"
 version = "2.1.0"
 description = ""
-authors = ["Nate Peterson <nate_peterson@byu.edu>"]
+authors = ["Application Engineering <oit-developer@byu.edu>"]
 license = "Apache-2.0"
 readme = "README.md"
 homepage = "https://github.com/byu-oit/byu-jwt-python"
