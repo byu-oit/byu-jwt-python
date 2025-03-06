@@ -1,21 +1,21 @@
 [tool.poetry]
 name = "byu_jwt"
-version = "2.0.0"
+version = "2.1.0"
 description = ""
-authors = ["Nate Peterson <nate_peterson@byu.edu>"]
+authors = ["Application Engineering <oit-developer@byu.edu>"]
 license = "Apache-2.0"
 readme = "README.md"
 homepage = "https://github.com/byu-oit/byu-jwt-python"
 repository = "https://github.com/byu-oit/byu-jwt-python"
 
 [tool.poetry.dependencies]
-python = "^3.4"
-requests = "^2.21"
-pyjwt = "^1.7"
-cryptography = "^2.4"
+python = "^3.9"
+requests = "^2.32"
+pyjwt = "^2.10"
+cryptography = ">=3"
 
-[tool.poetry.dev-dependencies]
-pytest = "^4.0"
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3"
 
 [build-system]
 requires = ["poetry>=0.12"]
