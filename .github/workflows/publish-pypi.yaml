@@ -1,9 +1,5 @@
-on:
-  release:
-    types:
-      - published
-
-name: release
+name: Publish Python 🐍 distribution 📦 to PyPi
+on: push
 
 jobs:
   build:
